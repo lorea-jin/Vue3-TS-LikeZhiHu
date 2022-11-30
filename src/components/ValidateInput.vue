@@ -27,8 +27,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, reactive, ref, onMounted } from 'vue'
-import {emitter} from './ValidateForm.vue'
+import { defineComponent, PropType, reactive, ref, onMounted, onUnmounted } from 'vue'
+import { emitter } from './ValidateForm.vue'
 interface RuleProp {
   type: 'required' | 'email' | 'range' | 'custom'
   validator?: () => boolean
@@ -60,6 +60,7 @@ export default defineComponent({
       message: '',
     })
 
+		// 单个表单项的验证方法
     const validateInput = () => {
       if (props.rules) {
         const allPassed = props.rules.every(item => {
@@ -106,7 +107,7 @@ export default defineComponent({
     const valid = ref(null)
     onMounted(() => {
       // 触发监听事件，传送验证Fn到form组件中
-			emitter.emit('form-item-created',validInfo.val)
+      emitter.emit('form-item-created', validateInput)
     })
 
     return { validateInput, validInfo, updateVal, valid }

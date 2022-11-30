@@ -15,34 +15,43 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue'
+import { defineComponent, onUnmounted, ref } from 'vue'
 import mitt from 'mitt'
 export const emitter = mitt()
+type validFn = () => Boolean
 export default defineComponent({
   name: 'ValidateForm',
   emits: ['submit-form'],
   setup(props, { emit }) {
     const validSlotRef = ref(null)
-
+    const FnArr = ref<validFn[]>([])
     const handleSubmit = () => {
-      //处理提交逻辑
-      // todo： 1.获取slot中所有input验证的结果，然后发给父组件
-      // form中加监听器，
-      // input组件中 手动触发监听器
-	
-			
-      emit('submit-form', true)
+      // 处理提交逻辑，需求：获取slot中所有input验证的结果，发送给父组件app，vue
+      // 步骤1：input组件中 手动触发监听器
+      // 步骤2：form组件中加监听器，
+      if (FnArr) {
+        const result = FnArr.value.map(item => item()).every(val => val)
+        emit('submit-form', result)
+      }
     }
 
-		const callback = (val:string) => {
-			console.log(val);
-			
-		}
-		emitter.on('form-item-created', callback)
+	
+		// 收集的验证方法的数组
+    const callback = (fn: validFn) => {
+      if (fn) {
+        FnArr.value.push(fn)
+      }
+    }
+    emitter.on('form-item-created', callback)
 
+    onUnmounted(() => {
+      emitter.off('form-item-created')
+      FnArr.value = []
+    })
     return {
       validSlotRef,
       handleSubmit,
+      FnArr,
     }
   },
 })

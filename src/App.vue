@@ -72,13 +72,14 @@ const pswRules: RulesProp = [
 ]
 
 
-let mailVal = ref('123@qq.com')
-let pswVal = ref('666666')
+let mailVal = ref('')
+let pswVal = ref('')
 let validRef = ref<any>(null)
 
+// 提交表单事件，拿到是否验证通过的结果
 const onSubmitForm = (val: boolean) => {
-	//提交后做一些事情...
-	// console.log(validRef.value.validateInput());
+	console.log('最终结果：'+val);
+	
 }
 
 onMounted(() => {
